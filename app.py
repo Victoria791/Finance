@@ -59,9 +59,9 @@ col1, col2 = st.columns(2)
 
 with col1:
     st.header("Input Your Financial Details")
-    income = st.number_input("Enter your monthly income ($)", min_value=0.0)
-    fixed_expenses = st.number_input("Enter your fixed expenses ($)", min_value=0.0)
-    discretionary_expenses = st.number_input("Enter your discretionary expenses ($)", min_value=0.0)
+    income = st.number_input("Enter your monthly income (Ksh)", min_value=0.0)
+    fixed_expenses = st.number_input("Enter your fixed expenses (Ksh)", min_value=0.0)
+    discretionary_expenses = st.number_input("Enter your discretionary expenses (Ksh)", min_value=0.0)
     risk_tolerance = st.selectbox("Select your risk tolerance", options=["Low (1)", "Medium (2)", "High (3)"])
 
 if income > 0:
@@ -101,6 +101,7 @@ if income > 0:
         st.markdown(f"**Based on your risk tolerance:** {investment_recommendation}")
 
 # Additional Features
+
 st.sidebar.header("📊 Insights and Analytics")
 st.sidebar.write("Track your financial trends and explore advanced analytics.")
 st.sidebar.button("Download Budget as Excel")
