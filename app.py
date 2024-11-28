@@ -4,13 +4,20 @@ import numpy as np
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 
-# Title of the app
-st.title("Budget Planning and Investment Recommendation Tool")
+# Page configuration
+st.set_page_config(
+    page_title="Budget Planner & Investment Advisor",
+    page_icon="💰",
+    layout="wide"
+)
+
+# Title and header
+st.title("💵 Budget Planning & Investment Recommendation Dashboard")
+st.markdown("Plan your finances effectively and make informed investment decisions.")
 
 # Load the dataset
 @st.cache_data
 def load_data():
-    # Replace with your dataset path
     df = pd.read_csv("Finance_data.csv")
     return df
 
@@ -47,18 +54,20 @@ investment_mapping = {
     3: "High-risk investments: Stocks, Real Estate"
 }
 
-# Interactive user input
-st.header("Input Your Financial Details")
+# Layout: Two columns for input and output
+col1, col2 = st.columns(2)
 
-income = st.number_input("Enter your monthly income ($)", min_value=0.0)
-fixed_expenses = st.number_input("Enter your fixed expenses ($)", min_value=0.0)
-discretionary_expenses = st.number_input("Enter your discretionary expenses ($)", min_value=0.0)
-risk_tolerance = st.selectbox("Select your risk tolerance", options=["Low (1)", "Medium (2)", "High (3)"])
+with col1:
+    st.header("Input Your Financial Details")
+    income = st.number_input("Enter your monthly income ($)", min_value=0.0)
+    fixed_expenses = st.number_input("Enter your fixed expenses ($)", min_value=0.0)
+    discretionary_expenses = st.number_input("Enter your discretionary expenses ($)", min_value=0.0)
+    risk_tolerance = st.selectbox("Select your risk tolerance", options=["Low (1)", "Medium (2)", "High (3)"])
 
 if income > 0:
     # Predict savings
     user_features = pd.DataFrame([[income, fixed_expenses, discretionary_expenses]], 
-                              columns=['Income', 'Fixed Expenses', 'Discretionary Expenses'])
+                                  columns=['Income', 'Fixed Expenses', 'Discretionary Expenses'])
     predicted_savings = model.predict(user_features)[0]
 
     # Suggest budget
@@ -74,13 +83,24 @@ if income > 0:
     risk_tolerance_numeric = {'Low (1)': 1, 'Medium (2)': 2, 'High (3)': 3}[risk_tolerance]
     investment_recommendation = investment_mapping[risk_tolerance_numeric]
 
-    # Display results
-    st.subheader("Predicted Savings and Budget Suggestions")
-    st.write(f"**Predicted Savings:** ${predicted_savings:.2f}")
-    st.write(f"**Suggested Fixed Expenses:** ${suggested_fixed:.2f}")
-    st.write(f"**Suggested Discretionary Expenses:** ${suggested_discretionary:.2f}")
-    st.write(f"**Suggested Savings:** ${suggested_savings:.2f}")
-    st.write(f"**Overspending Alert:** {'Yes' if overspending_alert else 'No'}")
+    with col2:
+        st.header("💡 Budget Summary")
+        st.metric("Predicted Savings", f"${predicted_savings:.2f}")
+        st.metric("Overspending Alert", "Yes" if overspending_alert else "No", 
+                  delta="⚠️" if overspending_alert else "✔️")
 
-    st.subheader("Investment Recommendation")
-    st.write(f"**Based on your risk tolerance:** {investment_recommendation}")
+        # Visualize budget suggestions
+        st.subheader("Suggested Budget Allocation")
+        st.bar_chart(pd.DataFrame({
+            "Category": ["Fixed Expenses", "Discretionary Expenses", "Savings"],
+            "Amount": [suggested_fixed, suggested_discretionary, suggested_savings]
+        }).set_index("Category"))
+
+        # Display investment recommendation
+        st.subheader("📈 Investment Recommendation")
+        st.markdown(f"**Based on your risk tolerance:** {investment_recommendation}")
+
+# Additional Features
+st.sidebar.header("📊 Insights and Analytics")
+st.sidebar.write("Track your financial trends and explore advanced analytics.")
+st.sidebar.button("Download Budget as Excel")
